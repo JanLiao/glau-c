@@ -276,3 +276,15 @@
 	-fx-padding: 0;  
     -fx-background-insets: 0;
 }
+.white-A100 {
+    -fx-background-color: rgb(250, 250, 250);
+    -fx-text-fill: rgba(0, 0, 0, 0.87);
+}
+.blue-A100 {
+    -fx-background-color: #2979ff;
+    -fx-text-fill: rgba(0, 0, 0, 0.87);
+}
+.deep-purple-400 {
+    -fx-background-color: #7e57c2;
+    -fx-text-fill: rgba(255, 255, 255, 0.87);
+}

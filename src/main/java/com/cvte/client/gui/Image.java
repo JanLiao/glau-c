@@ -15,18 +15,18 @@ public class Image extends RecursiveTreeObject<Image> {
 	
 	public final StringProperty createTime;
 	
-	public final StringProperty isUpload;
+	public final ObjectProperty isUpload;
 	
 	public final ObjectProperty upload;
 	
 	//public final ObjectProperty report;
 	
-	public Image(String id, String imgName, String createTime, String isUpload,
+	public Image(String id, String imgName, String createTime, Object isUpload,
 			Object upload) {
 		this.id = new SimpleStringProperty(id);
 		this.imgName = new SimpleStringProperty(imgName);
 		this.createTime = new SimpleStringProperty(createTime);
-		this.isUpload = new SimpleStringProperty(isUpload);
+		this.isUpload = new SimpleObjectProperty(isUpload);
 		this.upload = new SimpleObjectProperty(upload);
 		//this.report = new SimpleObjectProperty(report);
 	}

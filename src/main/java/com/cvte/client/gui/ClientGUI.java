@@ -116,14 +116,14 @@ public class ClientGUI extends Application {
 
 			public void run() {
 				PropertyUtil propertyUtil = new PropertyUtil();
-		        if(propertyUtil.loadProperty()) {
-		    	   NettyClient nettyClient = new NettyClient();
-		           try {
-					nettyClient.connect(PropertyUtil.ServerNettyPort, PropertyUtil.ServerIP);  
-				} catch (Exception e) {
-					e.printStackTrace();
+				if (propertyUtil.loadProperty()) {
+					NettyClient nettyClient = new NettyClient();
+					try {
+						nettyClient.connect(PropertyUtil.ServerNettyPort, PropertyUtil.ServerIP);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
-		        }
 			}
     		
     	});

@@ -27,6 +27,9 @@ public class PropertyUtil {  //获得配置文件的属性
 	public static String Img_Result_Path;
 	public static String Logger_Path;
 	public static String Pdf_Read_Path;
+	public static String rem;
+	public static String Auto_Connection;
+	public static String num;
 	
 
 	public boolean loadProperty() {
@@ -51,6 +54,9 @@ public class PropertyUtil {  //获得配置文件的属性
 			Img_Result_Path = prop.getProperty("Img_Result_Path", "");
 			Logger_Path = prop.getProperty("Logger_Path", "");
 			Pdf_Read_Path = prop.getProperty("Pdf_Read_Path", "");
+			rem = prop.getProperty("rem", "");
+			Auto_Connection = prop.getProperty("Auto_Connection", "");
+			num = prop.getProperty("num", "");
 		    
 			return true;
 		} catch (Exception e) {
@@ -106,7 +112,7 @@ public class PropertyUtil {  //获得配置文件的属性
 		//util.updateProperty("Pdf_Read_Path", "C:/Program Files (x86)/Foxit Software/Foxit Reader/FoxitReader.exe");
 	}
 
-	public void writePro(Map<String, String> map) {
+	public static void writePro(Map<String, String> map) {
 		try{
 			String rootPath = System.getProperty("user.dir").replace("\\", "/");
 			File f5=new File(rootPath + clientPropPath);

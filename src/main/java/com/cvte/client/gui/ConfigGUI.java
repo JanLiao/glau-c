@@ -153,7 +153,7 @@ public class ConfigGUI extends Application{
             	map.put("Pdf_Read_Path", readText.getText());
                 //actiontarget.setFill(Color.FIREBRICK);
             	actiontarget.setFill(Color.GREEN);
-            	new PropertyUtil().writePro(map);
+            	PropertyUtil.writePro(map);
                 actiontarget.setText("配置信息保存成功");
             }
         });

@@ -1,6 +1,8 @@
 package com.cvte.client.util;
 
 import java.io.IOException;
+import java.util.List;
+
 import com.cvte.client.constant.Constant;
 import com.cvte.client.gui.ClientGUI;
 
@@ -47,4 +49,22 @@ public class OpenPDF {
 				e.printStackTrace(); } 
 			}
 		}
+
+	public static void openPDF(String name) {
+		List<String[]> list = ReadCSV.readCSV(PropertyUtil.Logger_Path + 
+    			"/" + "logger.csv");
+		Process process = null;
+		for(String[] s : list) {
+			if(name.equals(s[0])) {				
+				try { 
+					//process = Runtime.getRuntime().exec(Constant.pdfRead + "  " +   filepath);
+					process = Runtime.getRuntime().exec(PropertyUtil.Pdf_Read_Path + "  " +   s[1]);
+					Constant.list.add(process);
+				} catch (IOException e) { 
+					e.printStackTrace(); 
+				}
+				break;
+			}
+		}
+	}
 }

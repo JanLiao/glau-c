@@ -11,10 +11,12 @@ import org.slf4j.LoggerFactory;
 
 import com.cvte.client.gui.ClientGUI;
 import com.cvte.client.util.Constant;
+import com.cvte.client.util.LoginUtil;
 import com.cvte.client.util.OpenPDF;
 import com.cvte.client.util.PropertyUtil;
 import com.cvte.client.util.ReadCSV;
 import com.cvte.client.util.SaveToCSV;
+import com.cvte.client.util.TableDataUtil;
 import com.cvte.client.util.TransferFileHandler;
 import com.cvte.netty.msg.HeartBeatMsg;
 import com.cvte.netty.msg.ImgInfo;
@@ -38,6 +40,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
     public void channelActive(ChannelHandlerContext ctx) {   //一建立连接就发送该终端的信息, 以验证该终端可以连接服务器
 		channelcx = ctx;
+		com.cvte.client.constant.Constant.ctx = ctx;
 		ctx.writeAndFlush(new ValidateMsg(PropertyUtil.SerialNumber, PropertyUtil.ConnectPassword));  
     }
 
@@ -85,9 +88,10 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
       				  ClientGUI.area.appendText("\t\n" + "validate success! " + Constant.getTerminalId());
       			  }
         	  } else {
-        		  JOptionPane.showMessageDialog(null, resultMsg.getMsg(), "验证失败", JOptionPane.ERROR_MESSAGE); 
+        		  //JOptionPane.showMessageDialog(null, resultMsg.getMsg(), "验证失败", JOptionPane.ERROR_MESSAGE); 
+        		  LoginUtil.loginText.setText("账号不存在或密码错误");
         		  //断开netty的连接
-        		  //ctx.close();
+        		  ctx.close();
         	  }
         	  break;
         	
@@ -138,6 +142,9 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 					  ClientGUI.area.appendText("\t\n" + "收到处理信息log----" + log);
 				  }
         		  SaveToCSV.saveLog(log);
+        		  
+        		  // 保存完logger日志后  刷新表格数据
+        		  TableDataUtil.resetData();
         	  }
         	  
           default:

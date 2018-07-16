@@ -1,6 +1,7 @@
 package com.cvte.client.util;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import com.jfoenix.controls.JFXAlert;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialogLayout;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
@@ -88,6 +90,7 @@ public class DialogUtil {
 		return flag;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static void login(Stage stage) {
 		JFXAlert alert = new JFXAlert((Stage)stage.getScene().getWindow());
         alert.setOverlayClose(false);
@@ -109,6 +112,55 @@ public class DialogUtil {
         	alert.hideWithAnimation();
         });
         layout.setActions(closeButton);
+        alert.setContent(layout);
+        alert.show();
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static void generateNum(Stage stage, String num) {
+		DecimalFormat df = new DecimalFormat("00000");
+		JFXAlert alert = new JFXAlert((Stage)stage.getScene().getWindow());
+        alert.setOverlayClose(false);
+        alert.setSize(250, 250);
+        JFXDialogLayout layout = new JFXDialogLayout();
+        Label label = new Label("生 成 的 用 户 ID");
+        label.setStyle("-fx-text-fill:rgb(114, 114, 255); -fx-font-size: 15px;");
+        layout.setHeading(label);
+        Label content = new Label(df.format(Integer.parseInt(num)));
+        content.setStyle("-fx-text-fill: RED;"
+        		+ "-fx-font-size: 45px;-fx-padding: 0.6em 0.60em;");
+        content.setAlignment(Pos.CENTER);
+        layout.setBody(content);
+        JFXButton closeButton = new JFXButton("关  闭");
+        closeButton.setStyle("-fx-background-color: GREEN; -fx-text-fill:WHITE;"
+        		+ "-fx-font-size: 15px;-fx-padding: 0.5em 0.50em;");
+        closeButton.setOnAction(event -> alert.hideWithAnimation());
+        layout.setActions(closeButton);
+        alert.setContent(layout);
+        alert.show();
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static void resetNum(Stage stage) {
+		JFXAlert alert = new JFXAlert((Stage)stage.getScene().getWindow());
+        alert.setOverlayClose(false);
+        alert.setSize(250, 160);
+        JFXDialogLayout layout = new JFXDialogLayout();
+        layout.setHeading(new Label("温馨小提示"));
+        Label content = new Label("确 定 重 置 用 户 ID");
+        layout.setBody(content);
+        JFXButton btn = new JFXButton("确   定");
+        btn.setStyle("-fx-background-color: GREEN;-fx-text-fill: WHITE;-fx-font-size: 15px;-fx-padding: 0.5em 0.50em;");
+        btn.setOnAction(event -> {
+        	Map<String, String> map = ReadPropertyUtil.readPro();
+        	map.put("num", "1");
+        	PropertyUtil.writePro(map);
+        	alert.hideWithAnimation();
+        });
+        JFXButton closeButton = new JFXButton("关  闭");
+        closeButton.setStyle("-fx-background-color: GREEN;-fx-text-fill: WHITE;-fx-font-size: 15px;-fx-padding: 0.5em 0.50em;");
+        closeButton.setOnAction(event -> alert.hideWithAnimation());
+        layout.setActions(btn, closeButton);
         alert.setContent(layout);
         alert.show();
 	}

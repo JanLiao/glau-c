@@ -10,6 +10,7 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import org.joda.time.DateMidnight.Property;
@@ -70,7 +71,12 @@ public class WatchImageService {
 			  for(File pic : allfile) {
 				  if(!pic.isDirectory()) {
 					  String fpath = PropertyUtil.TransferDirectoryPath + "/" + pic.getName();
-					  transferPicture(pic.getName(), fpath, ctx);
+					  if("OD".equals(pic.getName().substring(0, 2)) || 
+								"OS".equals(pic.getName().substring(0, 2))) {
+						  System.out.println("手持眼底图不进行处理");
+					  }else {
+						  transferPicture(pic.getName(), fpath, ctx);
+					  }
 				  }
 			  }
 		  }else if(logSize != 0 && allfile.length == 0) {
@@ -83,7 +89,12 @@ public class WatchImageService {
 				  if(checkTransfer(pic, list)) {
 					  if(!pic.isDirectory()) {
 						  String fpath = PropertyUtil.TransferDirectoryPath + "/" + pic.getName();
-						  transferPicture(pic.getName(), fpath, ctx);
+						  if("OD".equals(pic.getName().substring(0, 2)) || 
+									"OS".equals(pic.getName().substring(0, 2))) {
+							  System.out.println("手持眼底图不进行处理");
+						  }else {
+							  transferPicture(pic.getName(), fpath, ctx);
+						  }
 					  }
 				  }
 			  }
@@ -91,6 +102,7 @@ public class WatchImageService {
 		  
 		
 		final Path path = Paths.get(PropertyUtil.TransferDirectoryPath);
+		DecimalFormat df = new DecimalFormat("00000");
 		
 		try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
 			path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE
@@ -138,13 +150,22 @@ public class WatchImageService {
     						transferMsg.setMsgType(MsgType.ImgTransfer);
     						transferMsg.setAttachment(FileUtil.gZip(attachment));
     						//transferMsg.setFileName(fileName);
-    						transferMsg.setFileName(PropertyUtil.SerialNumber + "," + name.toString());
-    						if(ClientGUI.area != null) {
-    							ClientGUI.area.appendText("\t\n" + "create=====");
-    							  ClientGUI.area.appendText("\t\n" + PropertyUtil.SerialNumber + "," + name.toString() + "=" + size);
-    							  ClientGUI.area.appendText("\t\n" + "attach=" + attachment.length);
-    						  }
-    						ctx.writeAndFlush(transferMsg);
+    						PropertyUtil prop = new PropertyUtil();
+    						if(prop.loadProperty()) {
+    							if("OD".equals(name.toString().substring(0, 2)) || 
+    									"OS".equals(name.toString().substring(0, 2))) {
+    								transferMsg.setFileName(PropertyUtil.SerialNumber + "," + name.toString() + 
+    										"," + df.format((Integer.parseInt(PropertyUtil.num) - 1)));
+    							}else {
+    								transferMsg.setFileName(PropertyUtil.SerialNumber + "," + name.toString());
+    							}
+    							if(ClientGUI.area != null) {
+    								ClientGUI.area.appendText("\t\n" + "create=====");
+    								ClientGUI.area.appendText("\t\n" + PropertyUtil.SerialNumber + "," + name.toString() + "=" + size);
+    								ClientGUI.area.appendText("\t\n" + "attach=" + attachment.length);
+    							}
+    							ctx.writeAndFlush(transferMsg);
+    						}
                         }else {
                         	System.out.println("not a jpg file");
                         	if(ClientGUI.area != null) {
@@ -176,7 +197,7 @@ public class WatchImageService {
 					}else if(kind == StandardWatchEventKinds.ENTRY_MODIFY) {
 						System.out.println("modify=");
 						WatchEvent<Path> watch = (WatchEvent<Path>) watchEvent;
-						Path name = watch.context();		
+						Path name = watch.context();
 					}
 					
 					final WatchEvent<Path> watchEventPath = (WatchEvent<Path>) watchEvent;
@@ -212,7 +233,10 @@ public class WatchImageService {
 			TransferMsg transferMsg = new TransferMsg();
 			transferMsg.setMsgType(MsgType.ImgTransfer);
 			transferMsg.setAttachment(FileUtil.gZip(attachment));
-			transferMsg.setFileName(filename);
+			PropertyUtil prop = new PropertyUtil();
+			if(prop.loadProperty()) {
+				transferMsg.setFileName(PropertyUtil.SerialNumber + "," + filename);
+			}
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -228,7 +252,7 @@ public class WatchImageService {
 		
 	}
 
-	private static boolean checkTransfer(File pic, List<String[]> list) {
+	public static boolean checkTransfer(File pic, List<String[]> list) {
 		String name = pic.getName();
 		boolean flag = true;
 		for(String[] s : list) {

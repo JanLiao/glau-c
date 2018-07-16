@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.cvte.client.gui.Image;
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
+
+import io.netty.channel.ChannelHandlerContext;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 
 public class Constant {
 	
@@ -22,4 +27,12 @@ public class Constant {
 	
 	public static JFXTreeTableView<Image> TreeView = null;
 	
+	public static int LoginFlag = 0;
+	public static JFXButton btn = null;
+	//public static EventHandler<ActionEvent> event = null;
+	public static int ConnectionFlag = 0;  //0-断开  1-连接
+	
+	public static ChannelHandlerContext ctx = null;
+	
+	public static int num = 0;
 }
