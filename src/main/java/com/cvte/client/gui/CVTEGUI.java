@@ -183,7 +183,6 @@ public class CVTEGUI extends Application {
 				}
 				
 			}
-			
 		});
 		
 		JFXCheckBox checkBox = new JFXCheckBox("自动连接");
