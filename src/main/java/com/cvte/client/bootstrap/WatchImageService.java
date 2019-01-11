@@ -12,17 +12,26 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.joda.time.DateMidnight.Property;
 
+import com.cvte.client.constant.Constant;
 import com.cvte.client.gui.ClientGUI;
+import com.cvte.client.util.DialogUtil;
 import com.cvte.client.util.FileUtil;
+import com.cvte.client.util.MessageUtil;
 import com.cvte.client.util.PropertyUtil;
 import com.cvte.client.util.ReadCSV;
+import com.cvte.client.util.TableDataUtil;
 import com.cvte.netty.msg.MsgType;
 import com.cvte.netty.msg.TransferMsg;
 
 import io.netty.channel.ChannelHandlerContext;
+import javafx.application.Platform;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
 /**
  * @author jan
@@ -30,6 +39,8 @@ import io.netty.channel.ChannelHandlerContext;
  * @version V1.0 
  */
 public class WatchImageService {
+	
+	public static Lock lock = new ReentrantLock();
 	
 	@SuppressWarnings("unchecked")
 	public static void process(ChannelHandlerContext ctx) {
@@ -58,16 +69,22 @@ public class WatchImageService {
 		  File[] allfile = f.listFiles();
 		  if(logSize == 0 && allfile.length == 0) {
 			  System.out.println("启动发现当前文件夹为空----");
-			  if(ClientGUI.area != null) {
-				  ClientGUI.area.appendText("启动发现当前文件夹为空----");
-			  }
+//			  if(ClientGUI.area != null) {
+//				  ClientGUI.area.appendText("启动发现当前文件夹为空----");
+//			  }
+//			  if(Constant.MESSAGE != null) {
+//					Constant.M1.setText(Constant.M2.getText());
+//					Constant.M2.setText("启动发现当前文件夹为空");
+//				}
+			  MessageUtil.updateMessage("启动发现当前文件夹为空");
 		  }else if(logSize == 0 && allfile.length != 0) {
 			  System.out.println("启动发现未处理图片---");
 			  System.out.println("正在处理中..........请稍后");
-			  if(ClientGUI.area != null) {
-				  ClientGUI.area.appendText("启动发现未处理图片---");
-				  ClientGUI.area.appendText("正在处理中..........请稍后");
-			  }
+//			  if(ClientGUI.area != null) {
+//				  ClientGUI.area.appendText("启动发现未处理图片---");
+//				  ClientGUI.area.appendText("正在处理中..........请稍后");
+//			  }
+			  MessageUtil.updateMessage("正在处理中..........请稍后");
 			  for(File pic : allfile) {
 				  if(!pic.isDirectory()) {
 					  String fpath = PropertyUtil.TransferDirectoryPath + "/" + pic.getName();
@@ -81,9 +98,14 @@ public class WatchImageService {
 			  }
 		  }else if(logSize != 0 && allfile.length == 0) {
 			  System.out.println("启动发现当前文件夹为空----不用处理"); 
-			  if(ClientGUI.area != null) {
-				  ClientGUI.area.appendText("启动发现当前文件夹为空----不用处理");
-			  }
+//			  if(ClientGUI.area != null) {
+//				  ClientGUI.area.appendText("启动发现当前文件夹为空----不用处理");
+//			  }
+//			  if(Constant.MESSAGE != null) {
+//					Constant.M1.setText(Constant.M2.getText());
+//					Constant.M2.setText("启动发现当前文件夹为空,不进行处理");
+//			  }
+			  MessageUtil.updateMessage("启动发现当前文件夹为空,不进行处理");
 		  }else {
 			  for(File pic : allfile) {					  
 				  if(checkTransfer(pic, list)) {
@@ -92,6 +114,11 @@ public class WatchImageService {
 						  if("OD".equals(pic.getName().substring(0, 2)) || 
 									"OS".equals(pic.getName().substring(0, 2))) {
 							  System.out.println("手持眼底图不进行处理");
+//							  if(Constant.MESSAGE != null) {
+//									Constant.M1.setText(Constant.M2.getText());
+//									Constant.M2.setText("手持眼底图不进行处理");
+//							  }
+							  MessageUtil.updateMessage("手持眼底图不进行处理");
 						  }else {
 							  transferPicture(pic.getName(), fpath, ctx);
 						  }
@@ -108,9 +135,14 @@ public class WatchImageService {
 			path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE
 					, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.OVERFLOW);
 			System.out.println("start----->");
-			 if(ClientGUI.area != null) {
-				  ClientGUI.area.appendText("\t\n" + "start----->");
-			  }
+//			 if(ClientGUI.area != null) {
+//				  ClientGUI.area.appendText("\t\n" + "start----->");
+//			  }
+//			if(Constant.MESSAGE != null) {
+//				Constant.M1.setText(Constant.M2.getText());
+//				Constant.M2.setText("开始监听文件夹中-------");
+//			}
+			MessageUtil.updateMessage("开始监听文件夹中-------");
 			while(true){
 				final WatchKey key = watchService.take();
 				for (WatchEvent<?> watchEvent : key.pollEvents()) {
@@ -130,7 +162,7 @@ public class WatchImageService {
                         String filePath = PropertyUtil.TransferDirectoryPath + "/" + name.toString();
                         
                         String[] str1 = filePath.split("[.]");
-                        if(str1[str1.length - 1].toLowerCase().equals("jpg")) {
+                        if(str1[str1.length - 1].toLowerCase().equals("jpg") || str1[str1.length - 1].toLowerCase().equals("png")) {
                         	//System.out.println("filePath=" + filePath);
     						BigInteger md5 = FileUtil.getMD5(filePath);
     						File srcFile = new File(filePath);
@@ -154,23 +186,54 @@ public class WatchImageService {
     						if(prop.loadProperty()) {
     							if("OD".equals(name.toString().substring(0, 2)) || 
     									"OS".equals(name.toString().substring(0, 2))) {
-    								transferMsg.setFileName(PropertyUtil.SerialNumber + "," + name.toString() + 
-    										"," + df.format((Integer.parseInt(PropertyUtil.num) - 1)));
+    								System.out.println("UID记得输入");
+    								Label label = Constant.UID;
+    								String uid = label.getText();
+    								if("".equals(uid)) {
+    									System.out.println("UID有误");
+    									Stage stage = Constant.STAGE;
+    									Platform.runLater(new Runnable() {
+    									    @Override
+    									    public void run() {
+    									    	DialogUtil.errorUID(stage, "未输入UID,请输入UID后进行操作");
+    									    }
+    									});
+    								}else {
+    									transferMsg.setFileName(PropertyUtil.SerialNumber + "," + name.toString() + 
+        										"," + df.format((Integer.parseInt(uid))));
+    								}
     							}else {
     								transferMsg.setFileName(PropertyUtil.SerialNumber + "," + name.toString());
     							}
-    							if(ClientGUI.area != null) {
-    								ClientGUI.area.appendText("\t\n" + "create=====");
-    								ClientGUI.area.appendText("\t\n" + PropertyUtil.SerialNumber + "," + name.toString() + "=" + size);
-    								ClientGUI.area.appendText("\t\n" + "attach=" + attachment.length);
-    							}
+//    							if(ClientGUI.area != null) {
+//    								ClientGUI.area.appendText("\t\n" + "create=====");
+//    								ClientGUI.area.appendText("\t\n" + PropertyUtil.SerialNumber + "," + name.toString() + "=" + size);
+//    								ClientGUI.area.appendText("\t\n" + "attach=" + attachment.length);
+//    							}
+//    							if(Constant.MESSAGE != null) {
+//									Constant.M1.setText(Constant.M2.getText());
+//									Constant.M2.setText("create=====");
+//    							}
+//								if(Constant.MESSAGE != null) {
+//									Constant.M1.setText(Constant.M2.getText());
+//									Constant.M2.setText(PropertyUtil.SerialNumber + "," + name.toString()
+//									+ "=" + size + "=" + "attach=" + attachment.length);
+//								}
+								MessageUtil.updateMessage("create...");
+								MessageUtil.updateMessage(PropertyUtil.SerialNumber + "," + name.toString()
+								+ "=" + size + "=" + "attach=" + attachment.length);
     							ctx.writeAndFlush(transferMsg);
     						}
                         }else {
                         	System.out.println("not a jpg file");
-                        	if(ClientGUI.area != null) {
-              				  ClientGUI.area.appendText("\t\n" + "not a jpg file");
-              			  }
+//                        	if(ClientGUI.area != null) {
+//              				  ClientGUI.area.appendText("\t\n" + "not a jpg file");
+//              			  }
+//                        	if(Constant.MESSAGE != null) {
+//                				Constant.M1.setText(Constant.M2.getText());
+//                				Constant.M2.setText("当前文件不是图片");
+//                			}
+                        	MessageUtil.updateMessage("当前文件不是图片");
                         }
                         
 						
@@ -194,6 +257,13 @@ public class WatchImageService {
 						
 					}else if(kind == StandardWatchEventKinds.ENTRY_DELETE) {
 						System.out.println("deleted");
+						lock.lock();
+						try {							
+							// 删除时重新更新table表
+							TableDataUtil.resetData();
+						}catch(Exception e) {
+							e.printStackTrace();
+						}
 					}else if(kind == StandardWatchEventKinds.ENTRY_MODIFY) {
 						System.out.println("modify=");
 						WatchEvent<Path> watch = (WatchEvent<Path>) watchEvent;
@@ -226,10 +296,10 @@ public class WatchImageService {
 			
 			byte[] attachment = FileUtil.fileToBytes(fpath);
 			System.out.println("attach=" + attachment.length);
-			if(ClientGUI.area != null) {
-				  ClientGUI.area.appendText("\t\n" + filename + "=" + size);
-				  ClientGUI.area.appendText("\t\n" + "attach=" + attachment.length);
-			  }
+//			if(ClientGUI.area != null) {
+//				  ClientGUI.area.appendText("\t\n" + filename + "=" + size);
+//				  ClientGUI.area.appendText("\t\n" + "attach=" + attachment.length);
+//			  }
 			TransferMsg transferMsg = new TransferMsg();
 			transferMsg.setMsgType(MsgType.ImgTransfer);
 			transferMsg.setAttachment(FileUtil.gZip(attachment));
@@ -242,12 +312,17 @@ public class WatchImageService {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+//			if(Constant.MESSAGE != null) {
+//				Constant.M1.setText(Constant.M2.getText());
+//				Constant.M2.setText("图片传输中,请稍后...........");
+//			}
+			MessageUtil.updateMessage("图片传输中,请稍后...........");
 			ctx.writeAndFlush(transferMsg);
         }else {
         	System.out.println("not a jpg file");
-        	if(ClientGUI.area != null) {
-				  ClientGUI.area.appendText("\t\n" + "not a jpg file");
-			  }
+//        	if(ClientGUI.area != null) {
+//				  ClientGUI.area.appendText("\t\n" + "not a jpg file");
+//			  }
         }
 		
 	}

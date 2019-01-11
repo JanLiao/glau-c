@@ -82,14 +82,12 @@ public class NettyClient {  //netty的客户端
     
     
     public static void main(String args[]) throws Exception {
+    	// Server_IP=221.4.63.197
     	PropertyUtil propertyUtil = new PropertyUtil();
         if(propertyUtil.loadProperty()) {
     	   NettyClient nettyClient = new NettyClient();
            nettyClient.connect(PropertyUtil.ServerNettyPort, PropertyUtil.ServerIP);
         }
     }
-    
-    
-    
     
 }

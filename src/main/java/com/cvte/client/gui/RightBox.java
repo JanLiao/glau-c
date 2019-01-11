@@ -117,8 +117,16 @@ public class RightBox {
             		map.put("Serial_Number", PropertyUtil.SerialNumber);
             		map.put("Connect_Password", PropertyUtil.ConnectPassword);
             		map.put("rem", PropertyUtil.rem);
-            		map.put("Auto_Connection", PropertyUtil.Auto_Connection);
-            		map.put("num", PropertyUtil.num);
+            		if(PropertyUtil.Auto_Connection == null || "".equals(PropertyUtil.Auto_Connection)) {
+            			map.put("Auto_Connection", "0");
+            		}else {            			
+            			map.put("Auto_Connection", PropertyUtil.Auto_Connection);
+            		}
+            		if(PropertyUtil.num == null || "".equals(PropertyUtil.num)) {
+            			map.put("num", "1");
+            		}else {
+            			map.put("num", PropertyUtil.num);
+            		}
             	}
             	//将配置信息存储到map中
             	map.put("Server_IP", ipTextField.getText());
@@ -152,6 +160,8 @@ public class RightBox {
             		map.put("Serial_Number", PropertyUtil.SerialNumber);
             		map.put("Connect_Password", PropertyUtil.ConnectPassword);
             		map.put("rem", "0");
+            		map.put("Auto_Connection", PropertyUtil.Auto_Connection);
+            		map.put("num", PropertyUtil.num);
             	}
             	//将配置信息存储到map中
             	map.put("Server_IP", ipTextField.getText());

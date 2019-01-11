@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import com.cvte.client.bootstrap.NettyClient;
 import com.cvte.client.bootstrap.NettyClientHandler;
@@ -17,6 +18,7 @@ import com.cvte.client.constant.Constant;
 import com.cvte.client.util.CheckBoxUtil;
 import com.cvte.client.util.DialogUtil;
 import com.cvte.client.util.LoginUtil;
+import com.cvte.client.util.MessageUtil;
 import com.cvte.client.util.PathInit;
 import com.cvte.client.util.PropertyUtil;
 import com.cvte.client.util.ReadPropertyUtil;
@@ -26,6 +28,8 @@ import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXDrawersStack;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXProgressBar;
+import com.jfoenix.controls.JFXRadioButton;
+import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXDrawer.DrawerDirection;
 
 import javafx.animation.KeyFrame;
@@ -33,14 +37,18 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -61,11 +69,18 @@ public class CVTEGUI extends Application {
 	public Label label9 = new Label(""); // 用户ID
 	Label label10 = new Label("  未生成");
 	public Thread conThread = null;
+	public JFXProgressBar bar = null;
 	public ScheduledExecutorService service = null;
+	public HBox boxbar = null;
+	public JFXProgressBar bar1 = null;
+	public HBox box6 = null;
+	public HBox box10 = null;
+	public VBox box9 = null;
 	
 	@Override
 	public void start(Stage stage) throws Exception {
 		JFXDrawersStack drawersStack = new JFXDrawersStack();
+		Constant.Drawers_Stack = drawersStack;
 		AnchorPane pane = new AnchorPane();
 		//pane.setStyle("-fx-background-color:WHITE");
 //		JFXButton button = new JFXButton("1");
@@ -130,6 +145,7 @@ public class CVTEGUI extends Application {
         rightDrawer.setSidePane(rightDrawerPane);
         rightDrawer.setOverLayVisible(false);
         rightDrawer.setResizableOnDrag(true);
+        Constant.Right_Drawer = rightDrawer;
 		       
 		Image image = new Image(getClass().getResourceAsStream("4.png"));
 		ImageView view = new ImageView(image);
@@ -143,6 +159,7 @@ public class CVTEGUI extends Application {
 		tmpbox.getChildren().add(view);
 //		drawersStack.addEventHandler(MOUSE_PRESSED, e -> drawersStack.toggle(rightDrawer));
 		tmpbox.addEventHandler(MOUSE_PRESSED, e -> drawersStack.toggle(rightDrawer));
+		
 //		tmpbox.setOnMouseClicked(new EventHandler<MouseEvent>() {
 //
 //			@Override
@@ -166,7 +183,7 @@ public class CVTEGUI extends Application {
 		left.getChildren().add(box2);
 		
 		HBox box3 = new HBox();
-		box3.setSpacing(25);
+		box3.setSpacing(50);
 		box3.setAlignment(Pos.CENTER_LEFT);
 		JFXButton button2 = new JFXButton("连接");		
 		button2.setStyle("-fx-background-color:GREEN;"
@@ -185,28 +202,48 @@ public class CVTEGUI extends Application {
 			}
 		});
 		
-		JFXCheckBox checkBox = new JFXCheckBox("自动连接");
-		checkBox.setStyle("-fx-font-size:13px;");
-		checkBox.setOnAction(new EventHandler<ActionEvent>() {
-
-			@Override
-			public void handle(ActionEvent e) {
-				CheckBoxUtil.autoConnect(checkBox.isSelected());
+//		JFXCheckBox checkBox = new JFXCheckBox("自动连接");
+//		checkBox.setStyle("-fx-font-size:13px;");
+//		checkBox.setOnAction(new EventHandler<ActionEvent>() {
+//
+//			@Override
+//			public void handle(ActionEvent e) {
+//				CheckBoxUtil.autoConnect(checkBox.isSelected());
+//			}
+//			
+//		});		
+		Label message = new Label("消息提示");
+		message.setStyle("-fx-font-size:15px;-fx-text-fill: rgb(119, 25, 170);-fx-font-weight: bold;");
+		message.addEventHandler(MOUSE_PRESSED, e -> {
+			System.out.println("消息提示点击");
+			Stage st = Constant.MESSAGE;
+			if(st == null) {
+				MessageUtil.messageShow();
+			}else {
+				st.close();
+				Constant.MESSAGE = null;
 			}
-			
-		});		
-		box3.getChildren().addAll(button2, checkBox);
-		left.getChildren().add(box3);				
+		});
+		box3.getChildren().addAll(button2, message);
+		left.getChildren().add(box3);
 		
-		HBox boxbar = new HBox();
+		boxbar = new HBox();
 		boxbar.setMaxWidth(200);
 		boxbar.setPrefWidth(200);
-		JFXProgressBar bar = new JFXProgressBar();
+		bar = new JFXProgressBar();
         bar.setPrefWidth(200);
         bar.setMaxWidth(200);
+        bar.getStylesheets().add(CVTEGUI.class.getResource("jfx-progress-bar-unconnection.css").toExternalForm());
         Tooltip tip = new Tooltip("未连接");
         bar.setTooltip(tip);
         boxbar.getChildren().add(bar);
+        
+        bar1 = new JFXProgressBar();
+        bar1.setPrefWidth(200);
+        bar1.setMaxWidth(200);
+        bar1.getStylesheets().add(CVTEGUI.class.getResource("jfx-progress-bar-connection.css").toExternalForm());
+        Tooltip tip1 = new Tooltip("已连接");
+        bar1.setTooltip(tip1);
 
 //        JFXProgressBar jfxBarInf = new JFXProgressBar();
 //        jfxBarInf.setPrefWidth(500);
@@ -250,9 +287,49 @@ public class CVTEGUI extends Application {
         }
         left.getChildren().add(list);
         
-        left.getChildren().add(new Label(""));
+        //left.getChildren().add(new Label(""));
+        HBox radioBox = new HBox();
+        radioBox.setStyle("-fx-padding:8;");
+        radioBox.setAlignment(Pos.CENTER);
+        Label uid = new Label("UID");
+        final ToggleGroup group = new ToggleGroup();
+        JFXRadioButton javaRadio = new JFXRadioButton("顺  序");
+        javaRadio.setPadding(new Insets(5));
+        javaRadio.setSelected(true);
+        javaRadio.setStyle("-fx-text-fill: GREEN;-fx-font-size: 14;");
+        javaRadio.setToggleGroup(group);
+        JFXRadioButton jfxRadio = new JFXRadioButton("手  动");
+        jfxRadio.setPadding(new Insets(5));
+        jfxRadio.setStyle("-fx-text-fill: RED;-fx-font-size: 14;");
+        jfxRadio.setToggleGroup(group);
+        radioBox.getChildren().addAll(uid, javaRadio, jfxRadio);
+        left.getChildren().add(radioBox);
         
-        HBox box6 = new HBox();
+        javaRadio.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent arg0) {
+				left.getChildren().remove(box10);
+				left.getChildren().remove(box9);
+				left.getChildren().add(box6);
+				left.getChildren().add(box9);
+			}
+        	
+        });
+        
+        jfxRadio.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent arg0) {
+				left.getChildren().remove(box6);
+				left.getChildren().remove(box9);
+				left.getChildren().add(box10);
+				left.getChildren().add(box9);
+			}
+        	
+        });
+        
+        box6 = new HBox();
         box6.setSpacing(20);
         JFXButton button3 = new JFXButton("顺序生成用户名");
 		button3.setStyle("-fx-background-color:rgb(114, 114, 255);"
@@ -288,10 +365,47 @@ public class CVTEGUI extends Application {
 		box6.getChildren().addAll(button3, button4);
 		left.getChildren().add(box6);
 		
-		VBox box9 = new VBox();
+		box10 = new HBox();
+		box10.setSpacing(20);
+		JFXTextField uidText = new JFXTextField();
+		uidText.setPromptText("请输入有效UID");
+		uidText.setMaxWidth(125);
+		JFXButton idTextButton = new JFXButton("确定");
+		idTextButton.setStyle("-fx-background-color:GREEN;"
+				+ "-fx-text-fill: WHITE;-fx-font-size: 15px;");
+		idTextButton.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent e) {
+				String id = uidText.getText();
+				String msg = "";
+				if("".equals(id)) {
+					msg = "没有输入UID,请重新输入";
+					DialogUtil.errorUID(stage, msg);
+				}else {
+					if(isNumeric(id)) {
+						label10.setText("");
+						label9.setText(new DecimalFormat("00000000")
+								.format(Integer.parseInt(id)));
+						DialogUtil.generateNum(stage, new DecimalFormat("00000000")
+								.format(Integer.parseInt(id)));
+					}else {
+						msg = "输入的UID不符,请重新输入";
+						label9.setText("");
+						uidText.setText("");
+						DialogUtil.errorUID(stage, msg);
+					}
+				}
+			}
+			
+		});
+		box10.getChildren().addAll(uidText, idTextButton);
+		//left.getChildren().add(box10);
+		
+		box9 = new VBox();
 		HBox box7 = new HBox();
 		box7.setSpacing(10);
-		Label label8 = new Label("当前用户ID:");
+		Label label8 = new Label("当前UID:");
 		label8.setStyle("-fx-font-size:16px;-fx-text-fill: SeaGreen;");		
 		label10.setStyle("-fx-font-size:16px;-fx-text-fill: LimeGreen;");
 		box7.getChildren().addAll(label8, label10);
@@ -299,17 +413,18 @@ public class CVTEGUI extends Application {
 		box8.setAlignment(Pos.CENTER);
 		box8.getChildren().add(label9);
 		label9.setStyle("-fx-font-size:25px;-fx-text-fill: IndianRed;");
+		Constant.UID = label9;
 		box9.getChildren().addAll(new Label(""), box7, box8);
 		left.getChildren().add(box9);
         
         //设置自动连接服务器
-        PropertyUtil prop = new PropertyUtil();
-        if(prop.loadProperty()) {
-        	if("1".equals(PropertyUtil.Auto_Connection)) {
-        		checkBox.setSelected(true);
-        		connectBtn(label2, button2);
-        	}
-        }
+//        PropertyUtil prop = new PropertyUtil();
+//        if(prop.loadProperty()) {
+//        	if("1".equals(PropertyUtil.Auto_Connection)) {
+//        		checkBox.setSelected(true);
+//        		connectBtn(label2, button2);
+//        	}
+//        }
         
         VBox right = new VBox();
         right.setStyle("-fx-background-color:WHITE");
@@ -367,10 +482,27 @@ public class CVTEGUI extends Application {
                 System.exit(0);
             }
         });
+        Constant.SCENE = scene;
         stage.requestFocus();
+        
+		// 鼠标点击事件捕获
+		drawersStack.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
+			System.out.println(e.getSceneX() + "=" + e.getSceneY() + "=" + 
+		             e.getScreenX() + ",stage=" + stage.getWidth() + ",scene=" + scene.getWidth()
+		             + ",drawersStack=" + drawersStack.getWidth());
+			if (rightDrawer.isOpened()) {
+				if (e.getSceneX() > (scene.getWidth() - 250)) {
+					System.out.println("鼠标落在drawer上  = " + e.getSceneX());
+				} else {
+					// 关闭drawer
+					drawersStack.toggle(rightDrawer);
+				}
+			}
+		});
         
         // 初始化path路径及logger.csv文件
         PathInit.pathInit();
+        Constant.STAGE = stage;
         
         stage.show();
         //pane.requestFocus();
@@ -382,6 +514,10 @@ public class CVTEGUI extends Application {
         
         ListenerUtil.stageListen(stage);
 	}
+	public boolean isNumeric(String str) {
+		Pattern pattern = Pattern.compile("[0-9]*");
+		return pattern.matcher(str).matches();
+	}
 	
 	//netty客户端主动断开连接
 	protected void disconnectBtn(Label label2, JFXButton button2) {
@@ -390,6 +526,22 @@ public class CVTEGUI extends Application {
 		label2.setStyle("-fx-text-fill:RED;-fx-font-size: 15px;");
 		button2.setText("连接");
 		button2.setStyle("-fx-background-color:GREEN;-fx-text-fill:WHITE;");
+		System.out.println("主动断开连接");
+		boxbar.getChildren().remove(bar1);
+        boxbar.getChildren().add(bar);
+		//bar.setStyle("-fx-background-color: #E0E0E0");
+//		bar.styleProperty().bind(
+//			      Bindings
+//			        .when(bar.indeterminateProperty())
+//			          .then(
+//			            new SimpleStringProperty("-fx-background-color: #E0E0E0")
+//			          )
+//			          .otherwise(
+//			            new SimpleStringProperty("-fx-background-color: #E0E0E0")
+//			          )
+//			    );
+		//bar.getStylesheets().add(CVTEGUI.class.getResource("jfx-progress-bar-unconnection.css").toExternalForm());
+		//bar.getStylesheets().add(CVTEGUI.class.getResource("jfx-progress-bar-unconnection.css").toExternalForm());
 		Constant.flag = 1;  //主动关闭连接（netty）
 		Constant.ctx.close();
 		conThread.interrupt();
@@ -417,6 +569,9 @@ public class CVTEGUI extends Application {
 		label2.setStyle("-fx-text-fill:GREEN;-fx-font-size: 15px;");
 		button2.setText("断开");
 		button2.setStyle("-fx-background-color:RED;-fx-text-fill:WHITE;");
+		//bar.getStylesheets().add(CVTEGUI.class.getResource("jfx-progress-bar-connection.css").toExternalForm());
+		boxbar.getChildren().remove(bar);
+        boxbar.getChildren().add(bar1);
 		PropertyUtil propertyUtil = new PropertyUtil();
 		if (propertyUtil.loadProperty()) {
 			conThread = new Thread(new Runnable() {
@@ -432,7 +587,6 @@ public class CVTEGUI extends Application {
 						}
 					}
 				}
-	    		
 	    	});
 	    	conThread.start();
 		}

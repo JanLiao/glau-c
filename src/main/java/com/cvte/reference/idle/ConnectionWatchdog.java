@@ -51,9 +51,9 @@ public abstract class ConnectionWatchdog extends ChannelInboundHandlerAdapter im
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         
         System.out.println("当前链路已经激活了，重连尝试次数重新置为0");
-        if(ClientGUI.area != null) {
-			  ClientGUI.area.appendText("当前链路已经激活了，重连尝试次数重新置为0");
-		  }
+//        if(ClientGUI.area != null) {
+//			  ClientGUI.area.appendText("当前链路已经激活了，重连尝试次数重新置为0");
+//		  }
         attempts = 0;
         ctx.fireChannelActive();
     }
@@ -67,9 +67,9 @@ public abstract class ConnectionWatchdog extends ChannelInboundHandlerAdapter im
         }else if (Constant.flag == 0){
         	if(reconnect){
                 System.out.println("链接关闭，将进行重连");
-                if(ClientGUI.area != null) {
-      			  ClientGUI.area.appendText("\t\n" + "链接关闭，将进行重连");
-      		  }
+//                if(ClientGUI.area != null) {
+//      			  ClientGUI.area.appendText("\t\n" + "链接关闭，将进行重连");
+//      		  }
 
                 if (attempts < 12) {
                     attempts++;
@@ -113,9 +113,9 @@ public abstract class ConnectionWatchdog extends ChannelInboundHandlerAdapter im
                     f.channel().pipeline().fireChannelInactive();
                 }else{
                     System.out.println("重连成功");
-                    if(ClientGUI.area != null) {
-            			  ClientGUI.area.appendText("\t\n" + "重连成功");
-            		  }
+//                    if(ClientGUI.area != null) {
+//            			  ClientGUI.area.appendText("\t\n" + "重连成功");
+//            		  }
                 }
             }
         });

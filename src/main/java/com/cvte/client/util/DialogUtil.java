@@ -165,4 +165,20 @@ public class DialogUtil {
         alert.show();
 	}
 	
+	public static void errorUID(Stage stage, String msg) {
+		JFXAlert alert = new JFXAlert((Stage)stage.getScene().getWindow());
+        alert.setOverlayClose(false);
+        alert.setSize(300, 160);
+        JFXDialogLayout layout = new JFXDialogLayout();
+        layout.setHeading(new Label("温馨小提示"));
+        Label content = new Label(msg);
+        layout.setBody(content);
+        JFXButton closeButton = new JFXButton("关  闭");
+        closeButton.setStyle("-fx-background-color: GREEN;-fx-text-fill: WHITE;-fx-font-size: 15px;-fx-padding: 0.5em 0.50em;");
+        closeButton.setOnAction(event -> alert.hideWithAnimation());
+        layout.setActions(closeButton);
+        alert.setContent(layout);
+        alert.show();
+	}
+	
 }

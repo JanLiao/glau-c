@@ -166,9 +166,6 @@ public class SaveToCSV {
 //		}
 
 		System.out.println("logger=" + log);
-		if(ClientGUI.area != null) {
-			  ClientGUI.area.appendText("\t\n" + "logger=" + log);
-		  }
 		String filePath = csvFile + "/" +  "logger.csv";
 		File f2 = new File(filePath);
 		if(!f2.exists()) {
@@ -180,15 +177,9 @@ public class SaveToCSV {
 			}
 			System.out.println("start to write");
 			writeLoggerCSV(log, filePath);
-			if(ClientGUI.area != null) {
-				  ClientGUI.area.appendText("\t\n" + "logger is writed");
-			  }
 		}else {
 			System.out.println("start append");
 			appendLoggerCSV(log, filePath);
-			if(ClientGUI.area != null) {
-				  ClientGUI.area.appendText("\t\n" + "logger is writed");
-			  }
 		}
 		
 	}

@@ -5,12 +5,17 @@ import java.util.List;
 
 import com.cvte.client.gui.Image;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDrawer;
+import com.jfoenix.controls.JFXDrawersStack;
 import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 
 import io.netty.channel.ChannelHandlerContext;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
 public class Constant {
 	
@@ -35,4 +40,18 @@ public class Constant {
 	public static ChannelHandlerContext ctx = null;
 	
 	public static int num = 0;
+	
+	public static JFXDrawersStack Drawers_Stack = null;
+	
+	public static JFXDrawer Right_Drawer = null;
+	
+	public static Scene SCENE = null;
+	
+	public static Label UID = null;
+	
+	public static Stage STAGE = null;
+	
+	public static Stage MESSAGE = null;
+	public static Label M1 = null;
+	public static Label M2 = null;
 }

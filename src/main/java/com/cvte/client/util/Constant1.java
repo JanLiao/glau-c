@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 
-public class Constant {
+public class Constant1 {
 	
 	//线程池
 	public static ExecutorService cacheThreadPool = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 15, TimeUnit.MINUTES, new SynchronousQueue<Runnable>());
@@ -30,6 +30,6 @@ public class Constant {
 	}
 
 	public static void setTerminalId(String terminalId) {
-		Constant.terminalId = terminalId;
+		Constant1.terminalId = terminalId;
 	}
 }

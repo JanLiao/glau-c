@@ -5,6 +5,10 @@ import java.util.Map;
 
 public class ResultMsg extends BaseMsg { // 服务端返回的信息
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 582318096801545708L;
 	private boolean success;
 	private String msg; // 如果失败的话, 返回失败的原因
 	private Map<String, Object> data; // 从服务器返回的额外数据

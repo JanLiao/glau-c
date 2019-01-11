@@ -13,6 +13,8 @@ import com.cvte.client.util.OpenPDF;
 import com.cvte.client.util.PropertyUtil;
 import com.cvte.client.util.ReadCSV;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDrawer;
+import com.jfoenix.controls.JFXDrawersStack;
 import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
@@ -25,9 +27,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.CellEditEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -148,7 +152,7 @@ public class TableViewUtil {
         				e.printStackTrace();
         			}
         			
-        			//检查文件是否已经上传
+        			//检查文件是否已经上传       未上传不显示       你们要求的
         			JFXButton update = new JFXButton("");
         			//update.setDisable(true);
         			if(WatchImageService.checkTransfer(files[i], list)) {
@@ -159,9 +163,9 @@ public class TableViewUtil {
         				update.setText("已上传");
         				update.setStyle("-fx-background-color:rgb(65, 86, 172); "
         						+ "-fx-text-fill: WHITE;");
+        				images.add(new Image("" + (i + 1), files[i].getName(), 
+        						date, update, box1));
         			}
-        			images.add(new Image("" + (i + 1), files[i].getName(), 
-        					date, update, box1));
         		}
         	}
         }
@@ -207,6 +211,27 @@ public class TableViewUtil {
         JFXTreeTableView<Image> treeView = new JFXTreeTableView<>(root);
         treeView.setShowRoot(false);
         treeView.setEditable(true);
+        treeView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				System.out.println("窗口 = " + event.getX() + "=" + event.getY() + ", screen = ");
+				System.out.println("scene = " + event.getSceneX() + "=" + event.getSceneY());
+				System.out.println("screen = " + event.getScreenX() + "=" + event.getSceneY());
+				JFXDrawersStack drawersStack = Constant.Drawers_Stack;
+				JFXDrawer rightDrawer = Constant.Right_Drawer;
+				Scene scene = Constant.SCENE;
+				if (rightDrawer.isOpened()) {
+					if (event.getSceneX() > (scene.getWidth() - 250)) {
+						System.out.println("table 鼠标落在drawer上  = " + event.getSceneX());
+					} else {
+						// 关闭drawer
+						drawersStack.toggle(rightDrawer);
+					}
+				}
+			}
+        	
+        });
         //treeView.getStyleClass().add("edge-to-edge");
         treeView.getStyleClass().add("jan-table-noborder");
         treeView.getColumns().setAll(idColumn, imgColumn, timeColumn, isColumn, uploadColumn);

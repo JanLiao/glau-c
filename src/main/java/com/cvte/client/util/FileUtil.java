@@ -18,7 +18,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * @author: yezilong
+ * @author: jan
  */
 
 public class FileUtil {
